@@ -1,15 +1,14 @@
 from PIL import Image
 import json
 import numpy as np
-import preproc_beta
+# import preproc_beta
 import os
 
 slot_state = np.zeros((14,13))
 final_list = []
 cd = [0,0]
 
-#file_name = input("Enter file path: ");
-tt = Image.open("ttpxt.png")
+tt = Image.open(input("Enter file path: ")).rotate(180)
 
 dim = tt.size
 
@@ -21,26 +20,27 @@ def updateNPCoord():
         cd = [cd[0]+1, 0]
 
 '''
-filled slot = (0,255,0)
-empty slot = (255,255,0)
+filled slot = (204,255,51)
+empty slot = (255,255,204)
 '''
-cols = [(0,255,0),(255,255,0)]
+cols = [(204,255,51),(255,255,204), (249,239,164)]
 
 start = [] ##coordinates of the starting point
 
 i=0
 while i < dim[0]:
-    j = 0
-    while j < dim[1]:
-        rgb = tt.getpixel((i,j))
-        if rgb == (255,255,0) or rgb == (0,255,0):
-            start = [i,j]
-            i = dim[0] #breaking the outer loop
-            break #breaking the inner loop
-        j = j + 1
-    i = i + 1
+	j = 0
+	while j < dim[1]:
+		rgb = tt.getpixel((i,j))[0:3]
+		# print(rgb)
+		if rgb in cols:
+			start = [i,j]
+			i = dim[0] #breaking the outer loop
+			break #breaking the inner loop
+		j = j + 1
+	i = i + 1
 
-
+print(start)
 j = start[1]
 i = start[0]
 
@@ -49,7 +49,7 @@ try:
 	for b in range(14):
 
 		for a in range(13):
-			if tt.getpixel((i,j)) == (0,255,0):
+			if tt.getpixel((i,j))[0:3] == (204,255,51):
 				slot_state[cd[0], cd[1]] = 1
 
 			updateNPCoord()
@@ -58,9 +58,9 @@ try:
 				break
 
 			i = i + 1
-			while tt.getpixel((i,j)) != (0,0,0):
+			while tt.getpixel((i,j))[0:3] in cols:
 				i = i + 1
-			while tt.getpixel((i,j)) not in cols:
+			while tt.getpixel((i,j))[0:3] not in cols:
 				i = i + 1
 
     	#printing
@@ -74,9 +74,9 @@ try:
 
 		i = start[0]
 		j = j + 1
-		while tt.getpixel((i,j)) != (0,0,0):
+		while tt.getpixel((i,j))[0:3] in cols:
 			j = j + 1
-		while tt.getpixel((i,j)) not in cols:
+		while tt.getpixel((i,j))[0:3] not in cols:
 			j = j + 1
 
 except IndexError:
@@ -105,7 +105,7 @@ while a < 13:
         b = b + 1
     a = a + 2
 
-os.remove("ttpxt.png")
+# os.remove("ttpxt.png")
 print(json.dumps(final_list))
 x = input("\nGive any input to continue...")
 exit()
